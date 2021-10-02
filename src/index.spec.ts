@@ -1,10 +1,33 @@
 import { TodoOrDie } from "./index";
 
-const consoleErrorMock = jest.spyOn(console, 'error').mockImplementation();
+describe("TodoOrDie", () => {
+  const consoleErrorMock = jest.spyOn(console, "error").mockImplementation();
+  beforeEach(() => {
+    jest.useFakeTimers("modern");
+    [consoleErrorMock].forEach(m => m.mockReset());
+  });
 
-describe('basic test', ()=>{
-  it('should print an error', ()=>{
-    TodoOrDie('this is a test');
-    expect(consoleErrorMock).toBeCalledWith('this is a test');
-  })
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  describe("setting deadlines", () => {
+    it("does nothing if it's too early", () => {
+      jest.setSystemTime(new Date("1996-09-11").getTime());
+      TodoOrDie("Drop the experiment check by 10.10.2020", new Date("2020-10-10"));
+      expect(consoleErrorMock).not.toBeCalled();
+    });
+
+    it("displays error in console if time has come", () => {
+      jest.setSystemTime(new Date("2020-10-11").getTime());
+      TodoOrDie("Drop the experiment check", new Date("2020-10-10"));
+      expect(consoleErrorMock).toBeCalledWith("TODO: 'Drop the experiment check' is overdue. Do it!");
+    });
+
+    it("accepts date string as second argument", () => {
+      jest.setSystemTime(new Date("2020-10-11").getTime());
+      TodoOrDie("Drop the experiment check", "2020-10-10");
+      expect(consoleErrorMock).toBeCalledWith("TODO: 'Drop the experiment check' is overdue. Do it!");
+    });
+  });
 });
