@@ -4,7 +4,7 @@ describe("TodoOrDie", () => {
   const consoleErrorMock = jest.spyOn(console, "error").mockImplementation();
   beforeEach(() => {
     jest.useFakeTimers("modern");
-    [consoleErrorMock].forEach(m => m.mockReset());
+    [consoleErrorMock].forEach((m) => m.mockReset());
   });
 
   afterEach(() => {
