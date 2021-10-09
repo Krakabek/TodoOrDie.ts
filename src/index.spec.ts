@@ -4,7 +4,7 @@ describe("TodoOrDie", () => {
   const consoleErrorMock = jest.spyOn(console, "error").mockImplementation();
   beforeEach(() => {
     jest.useFakeTimers("modern");
-    [consoleErrorMock].forEach(m => m.mockReset());
+    [consoleErrorMock].forEach((m) => m.mockReset());
   });
 
   afterEach(() => {
@@ -28,6 +28,21 @@ describe("TodoOrDie", () => {
       jest.setSystemTime(new Date("2020-10-11").getTime());
       TodoOrDie("Drop the experiment check", "2020-10-10");
       expect(consoleErrorMock).toBeCalledWith("TODO: 'Drop the experiment check' is overdue. Do it!");
+    });
+  });
+  describe("custom trigger", () => {
+    it("accepts function as second argument", () => {
+      expect(() => {
+        TodoOrDie("Drop the experiment check", () => false);
+      }).not.toThrow();
+    });
+    it("displays error in console if custom trigger returns true", () => {
+      TodoOrDie("Drop the experiment check", () => true);
+      expect(consoleErrorMock).toBeCalledWith("TODO: 'Drop the experiment check' is overdue. Do it!");
+    });
+    it("does not display error in console if custom trigger returns false", () => {
+      TodoOrDie("Drop the experiment check", () => true);
+      expect(consoleErrorMock).not.toBeCalledWith();
     });
   });
 });

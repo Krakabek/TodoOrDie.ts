@@ -4,6 +4,10 @@
     "tslint-config-prettier"
   ],
   "rules": {
-    "unified-signatures": false
+    "unified-signatures": false,
+    "no-console": [
+      true,
+      "log"
+    ]
   }
 }
