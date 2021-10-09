@@ -30,4 +30,19 @@ describe("TodoOrDie", () => {
       expect(consoleErrorMock).toBeCalledWith("TODO: 'Drop the experiment check' is overdue. Do it!");
     });
   });
+  describe("custom trigger", () => {
+    it("accepts function as second argument", () => {
+      expect(() => {
+        TodoOrDie("Drop the experiment check", () => false);
+      }).not.toThrow();
+    });
+    it("displays error in console if custom trigger returns true", () => {
+      TodoOrDie("Drop the experiment check", () => true);
+      expect(consoleErrorMock).toBeCalledWith("TODO: 'Drop the experiment check' is overdue. Do it!");
+    });
+    it("does not display error in console if custom trigger returns false", () => {
+      TodoOrDie("Drop the experiment check", () => true);
+      expect(consoleErrorMock).not.toBeCalledWith();
+    });
+  });
 });
