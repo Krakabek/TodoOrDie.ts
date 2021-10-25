@@ -1,4 +1,4 @@
-import { TodoOrDie } from "./index";
+import { defaultOverdueHandler, setTodoOrDieConfig, TodoOrDie } from "./index";
 
 describe("TodoOrDie", () => {
   const consoleErrorMock = jest.spyOn(console, "error").mockImplementation();
@@ -30,6 +30,7 @@ describe("TodoOrDie", () => {
       expect(consoleErrorMock).toBeCalledWith("TODO: 'Drop the experiment check' is overdue. Do it!");
     });
   });
+
   describe("custom trigger", () => {
     it("accepts function as second argument", () => {
       expect(() => {
@@ -45,6 +46,7 @@ describe("TodoOrDie", () => {
       expect(consoleErrorMock).not.toBeCalledWith();
     });
   });
+
   describe("custom overdue handler", () => {
     it("should execute custom passed handler", () => {
       const customLogger = jest.fn() as (message: string) => void;
@@ -57,9 +59,27 @@ describe("TodoOrDie", () => {
     it("should not log error in console if custom handler is passed", () => {
       jest.setSystemTime(new Date("2021-10-14").getTime());
       TodoOrDie("Drop the experiment check", "2020-10-14", {
-        overdueHandler: ()=>{},
+        overdueHandler: () => {
+        },
       });
       expect(consoleErrorMock).not.toBeCalled();
+    });
+  });
+
+  describe("global config", () => {
+    afterEach(() => {
+      setTodoOrDieConfig({ overdueHandler: defaultOverdueHandler });
+    });
+
+    it("should set the default overdue handler", () => {
+      jest.setSystemTime(new Date("2021-10-14").getTime());
+      const customLogger = jest.fn() as (message: string) => void;
+
+      setTodoOrDieConfig({ overdueHandler: customLogger });
+      TodoOrDie("Drop the experiment check", "2020-10-14");
+
+      expect(consoleErrorMock).not.toBeCalled();
+      expect(customLogger).toBeCalledWith("Drop the experiment check");
     });
   });
 });
