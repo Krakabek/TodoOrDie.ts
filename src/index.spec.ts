@@ -45,4 +45,21 @@ describe("TodoOrDie", () => {
       expect(consoleErrorMock).not.toBeCalledWith();
     });
   });
+  describe("custom overdue handler", () => {
+    it("should execute custom passed handler", () => {
+      const customLogger = jest.fn() as (message: string) => void;
+      jest.setSystemTime(new Date("2021-10-14").getTime());
+      TodoOrDie("Drop the experiment check", "2020-10-14", {
+        overdueHandler: customLogger,
+      });
+      expect(customLogger).toBeCalledWith("Drop the experiment check");
+    });
+    it("should not log error in console if custom handler is passed", () => {
+      jest.setSystemTime(new Date("2021-10-14").getTime());
+      TodoOrDie("Drop the experiment check", "2020-10-14", {
+        overdueHandler: ()=>{},
+      });
+      expect(consoleErrorMock).not.toBeCalled();
+    });
+  });
 });
